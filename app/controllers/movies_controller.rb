@@ -11,7 +11,20 @@ class MoviesController < ApplicationController
   end
 
   def index
+        # If the user has specified a sorting mechanism, update session sorting mechanism
+
     @movies = Movie.all
+    
+    if params[:sorting_param]=='title'
+      @movies = @movies.sort { |a,b| a.title <=> b.title }
+      @title_highlight = "hilite"
+    else if params[:sorting_param]=='release_date'
+        @movies = @movies.sort { |a,b| a.release_date<=>b.release_date}
+        @date_highlight = "hilite"
+      end
+    end
+    
+    
   end
 
   def new
