@@ -11,9 +11,18 @@ class MoviesController < ApplicationController
   end
 
   def index
-        # If the user has specified a sorting mechanism, update session sorting mechanism
-
-    @movies = Movie.all
+       
+    @all_ratings = Movie.get_ratings
+    
+    @filtered_ratings = params[:ratings]
+    print("filter is")
+    print( @filtered_ratings)
+    if(@filtered_ratings.nil?)
+      print("yes")
+      @movies = Movie.all
+    else
+      @movies = Movie.where(rating:[@filtered_ratings.keys])
+    end
     
     if params[:sorting_param]=='title'
       @movies = @movies.sort { |a,b| a.title <=> b.title }
