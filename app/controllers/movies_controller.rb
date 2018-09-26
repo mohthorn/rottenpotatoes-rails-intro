@@ -14,25 +14,45 @@ class MoviesController < ApplicationController
        
     @all_ratings = Movie.get_ratings
     
-    @filtered_ratings = params[:ratings]
-    print("filter is")
-    print( @filtered_ratings)
-    if(@filtered_ratings.nil?)
-      print("yes")
-      @movies = Movie.all
-    else
-      @movies = Movie.where(rating:[@filtered_ratings.keys])
+    unless params[:ratings].nil?
+      @filtered_ratings = params[:ratings]
+      session[:filtered_ratings] = @filtered_ratings
     end
     
-    if params[:sorting_param]=='title'
+    unless(params[:sorting_param].nil?)
+      session[:sorting_param]=params[:sorting_param]
+    end
+    
+    #to be RESTful
+    if params[:sorting_param].nil? && params[:ratings].nil? && session[:filtered_ratings] #should
+      @filtered_ratings = session[:filtered_ratings]
+      @sorting_param = session[:sorting_param]
+      flash.keep
+      redirect_to movies_path({order_by: @sorting_param, ratings: @filtered_ratings})
+    else
+      if session[:filtered_ratings].nil?    
+        params[:sorting_param]={"G"=>"1", "PG"=>"1", "PG-13"=>"1", "R"=>"1"}
+      end
+    end
+    
+    
+    if(session[:filtered_ratings].nil?)
+      @movies = Movie.all
+    else
+      @movies = Movie.where(rating:[session[:filtered_ratings].keys])
+    end
+    
+    
+    if session[:sorting_param]=='title'
       @movies = @movies.sort { |a,b| a.title <=> b.title }
       @title_highlight = "hilite"
-    else if params[:sorting_param]=='release_date'
+    else if session[:sorting_param]=='release_date'
         @movies = @movies.sort { |a,b| a.release_date<=>b.release_date}
         @date_highlight = "hilite"
       end
     end
-    
+    #session.delete(:sorting_param)
+    #session.delete(:filtered_ratings)
     
   end
 

@@ -5,7 +5,7 @@
   Include:
   - @all_ratings.each do |rating|
     = rating
-    - if @filtered_ratings.nil? or @filtered_ratings.key?(rating) 
+    - if session[:filtered_ratings].nil? or session[:filtered_ratings].key?(rating) 
       = check_box_tag "ratings[#{rating}]",1,true
     -  else
       = check_box_tag "ratings[#{rating}]",1,false 
